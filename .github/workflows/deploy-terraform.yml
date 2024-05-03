@@ -30,7 +30,7 @@ jobs:
         role-to-assume: arn:aws:iam::932191515807:role/github-oidc/github-deployment
 
     - name: Initialize Terraform
-      run: terraform init
+      run: terraform init -backend-config="bucket=tf-state-eu-west-2-932191515807" -backend-config="key=alexmills-uk/aws-organisation.tfstate" -backend-config="dynamodb_table=tf-state-eu-west-2-932191515807"
       
     - name: Plan Terraform
       run: terraform plan -out=tfplan
