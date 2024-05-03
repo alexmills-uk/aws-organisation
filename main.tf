@@ -43,11 +43,44 @@ resource "aws_ssoadmin_managed_policy_attachment" "administrator_managed_policy_
   permission_set_arn = aws_ssoadmin_permission_set.admin_permissionset.arn
 }
 
-resource "aws_organizations_organization" "org" {
-  aws_service_access_principals = [
-    "cloudtrail.amazonaws.com",
-    "config.amazonaws.com",
-  ]
+data "aws_organizations_organization" "org" {}
 
-  feature_set = "ALL"
+resource "aws_organizations_organizational_unit" "sandbox" {
+  name      = "Sandbox"
+  parent_id = data.aws_organizations_organization.org.id
+}
+
+resource "aws_organizations_organizational_unit" "workloads" {
+  name      = "Workloads"
+  parent_id = data.aws_organizations_organization.org.id
+}
+
+resource "aws_organizations_organizational_unit" "suspended" {
+  name      = "Suspended"
+  parent_id = data.aws_organizations_organization.org.id
+}
+
+resource "aws_organizations_organizational_unit" "security" {
+  name      = "Security"
+  parent_id = data.aws_organizations_organization.org.id
+}
+
+resource "aws_organizations_organizational_unit" "exceptions" {
+  name      = "Exceptions"
+  parent_id = data.aws_organizations_organization.org.id
+}
+
+resource "aws_organizations_organizational_unit" "workloads_dev" {
+  name      = "Development"
+parent_id = aws_organizations_organizational_unit.workloads.id
+}
+
+resource "aws_organizations_organizational_unit" "workloads_staging" {
+  name      = "Staging"
+parent_id = aws_organizations_organizational_unit.workloads.id
+}
+
+resource "aws_organizations_organizational_unit" "workloads_production" {
+  name      = "Production"
+parent_id = aws_organizations_organizational_unit.workloads.id
 }
