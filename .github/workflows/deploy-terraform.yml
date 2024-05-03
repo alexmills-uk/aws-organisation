@@ -1,0 +1,47 @@
+name: Deploy Terraform
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Terraform
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+      
+    - name: Authenticate with AWS
+      id: aws-auth
+      run: |
+        aws sts assume-role-with-web-identity \
+          --role-arn arn:aws:iam::932191515807:role/github-oidc/github-deployment \
+          --role-session-name GitHubActions \
+          --web-identity-token ${{ secrets.AWS_WEB_IDENTITY_TOKEN }} \
+          --region eu-west-2 \
+          --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken]' \
+          --output json > aws_credentials.json
+
+    - name: Configure AWS CLI
+      run: |
+        aws configure set aws_access_key_id $(jq -r '.[0]' aws_credentials.json)
+        aws configure set aws_secret_access_key $(jq -r '.[1]' aws_credentials.json)
+        aws configure set aws_session_token $(jq -r '.[2]' aws_credentials.json)
+        aws configure set region eu-west-2
+
+    - name: Initialize Terraform
+      run: terraform init
+      
+    - name: Plan Terraform
+      run: terraform plan -out=tfplan
+      
+    - name: Apply Terraform
+      run: terraform apply -auto-approve tfplan
