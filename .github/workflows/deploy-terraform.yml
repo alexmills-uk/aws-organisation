@@ -6,13 +6,13 @@ on:
       - main
 
 jobs:
-  permissions:
-    id-token: write
 
   deploy:
     name: Deploy Terraform
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-latest    
+    permissions:
+      id-token: write
+   
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
