@@ -27,15 +27,15 @@ resource "aws_organizations_organizational_unit" "workloads" {
 
 resource "aws_organizations_organizational_unit" "workloads_dev" {
   name      = "Development"
-  parent_id = aws_organizations_organizational_unit.workloads.id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
 resource "aws_organizations_organizational_unit" "workloads_staging" {
   name      = "Staging"
-  parent_id = aws_organizations_organizational_unit.workloads.id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 }
 
 resource "aws_organizations_organizational_unit" "workloads_production" {
   name      = "Production"
-  parent_id = aws_organizations_organizational_unit.workloads.id
+  parent_id = data.aws_organizations_organization.org.roots[0].id
 }
