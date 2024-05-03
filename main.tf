@@ -84,3 +84,43 @@ resource "aws_organizations_organizational_unit" "workloads_production" {
   name      = "Production"
   parent_id = data.aws_organizations_organization.org.roots[0].id
 }
+
+resource "aws_organizations_account" "production" {
+  name                       = "Production"
+  email                      = "alex+production@alexmills.uk"
+  iam_user_access_to_billing = "ALLOW"
+
+  tags = {
+    Name  = "Production"
+    Owner = "AlexMills-UK"
+    Role  = "production"
+  }
+
+  parent_id = aws_organizations_organizational_unit.workloads_production.id
+}
+
+
+provider "aws" {
+  alias  = "production"
+  region = "eu-west-2"
+
+  default_tags {
+    tags = {
+      Repository = "github.com/alexmills-uk/aws-organisation"
+      Owner      = "platform-team"
+      Terraform  = "true"
+    }
+  }
+
+  assume_role {
+    role_arn = "arn:aws:iam::${aws_organizations_account.production.id}:role/OrganizationAccountAccessRole"
+  }
+
+  allowed_account_ids = [
+    aws_organizations_account.production.id
+  ]
+}
+
+resource "aws_s3_bucket" "production_tfstate" {
+  bucket = "tf-state-eu-west-2-${aws_organizations_account.production.id}"
+}
