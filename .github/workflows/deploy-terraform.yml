@@ -6,6 +6,9 @@ on:
       - main
 
 jobs:
+  permissions:
+    id-token: write
+
   deploy:
     name: Deploy Terraform
     runs-on: ubuntu-latest
@@ -22,7 +25,6 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        audience: sts.amazonaws.com
         aws-region: eu-west-2
         role-to-assume: arn:aws:iam::932191515807:role/github-oidc/github-deployment
 
