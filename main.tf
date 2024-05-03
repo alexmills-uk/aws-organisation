@@ -72,17 +72,17 @@ resource "aws_organizations_organizational_unit" "exceptions" {
 
 resource "aws_organizations_organizational_unit" "workloads_dev" {
   name      = "Development"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
+  parent_id = aws_organizations_organizational_unit.workloads.id
 }
 
 resource "aws_organizations_organizational_unit" "workloads_staging" {
   name      = "Staging"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
+  parent_id = aws_organizations_organizational_unit.workloads.id
 }
 
 resource "aws_organizations_organizational_unit" "workloads_production" {
   name      = "Production"
-  parent_id = data.aws_organizations_organization.org.roots[0].id
+  parent_id = aws_organizations_organizational_unit.workloads.id
 }
 
 resource "aws_organizations_account" "production" {
