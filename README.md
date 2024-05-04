@@ -18,7 +18,12 @@ The following details the effect remit of the Landing Zone solution:
 
 
 
-## How to
+## How to deploy from GitHub
 
-* Login to your root AWS account, navigate to IAM Identity Centre - click the Enable button.
-* Deploy a new CloudFormation stack using the template defined in ./oidc/github.yml, setting the input variables as appropriate. This stack creates an OIDC provider, S3 bucket and DynamoDB table that allow a Terraform GitHub Action to deploy further resources.
+* Login to your root AWS account, navigate to IAM Identity Centre - click the Enable button. Choose Enable with AWS Organizations when it gives you a choice.
+* Deploy a new CloudFormation stack using the template defined in ./oidc/github.yml, setting the input variables as appropriate. 
+    * This stack creates an OIDC provider which allows GitHub actions to retrieve temporary credentials, and an S3 bucket and DynamoDB table to store the Terraform state remotely.
+* In GitHub, navigate to the repository, click Settings, Secrets and Variables, Actions and add two new variables.
+    * AWS_REGION is the "home region" you will use to manage your AWS Organization.
+    * AWS_ACCOUNT_ID is the root AWS account that your AWS Organization hangs off.
+* Once the CloudFormation stack is Created, and the Variables have been set in Github, you can run the Deploy Terraform action and the organization will be created.
