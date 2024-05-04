@@ -22,10 +22,10 @@ Parameters:
       for examples of fitlering by branch or deployment environment.
   Path:
     Type: String
-    Description: IAM Path required for the role
+    Description: IAM Path required for the role. An alpha-numeric string that starts and ends with a /.
   ManagedPolicyARNs:
     Type: CommaDelimitedList
-    Description: Comma separated list for arns for managed policies to attach to the role
+    Description: Comma separated list of managed policy ARNs to attach to the role.
 
 Metadata:
   AWS::CloudFormation::Interface:
