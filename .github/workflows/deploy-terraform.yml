@@ -4,25 +4,25 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-
-  deploy:
-    name: Deploy Terraform
-    runs-on: ubuntu-latest    
+  plan:
+    name: Terraform Plan 
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
-   
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
+
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: 1.6.5
-      
+        terraform_version: 1.9.5
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
@@ -31,9 +31,41 @@ jobs:
 
     - name: Initialize Terraform
       run: terraform init -backend-config="bucket=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}" -backend-config="key=${{ github.repository }}.tfstate" -backend-config="dynamodb_table=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}"
-      
+
     - name: Plan Terraform
       run: terraform plan -out=tfplan
+
+  manual_approval:
+    name: Wait for Approval
+    runs-on: ubuntu-latest
+    needs: deploy # This ensures manual approval step runs after 'deploy' job
+    steps:
+    - name: Approval
+      run: |
+        echo "Terraform plan is ready. Proceed with approval to apply changes."
+        echo "::notice title=Manual Approval Required::Please approve the next step manually."
       
+  apply:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    needs: manual_approval # This ensures apply runs after manual approval
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.9.5
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-oidc/github-deployment
+
+    - name: Initialize Terraform
+      run: terraform init -backend-config="bucket=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}" -backend-config="key=${{ github.repository }}.tfstate" -backend-config="dynamodb_table=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}"
+
     - name: Apply Terraform
       run: terraform apply -auto-approve tfplan
