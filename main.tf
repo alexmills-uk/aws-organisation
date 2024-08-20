@@ -16,12 +16,6 @@ resource "aws_organizations_account" "production" {
   parent_id = aws_organizations_organizational_unit.workloads_production.id
 }
 
-resource "aws_identitystore_group_membership" "admin_production" {
-  identity_store_id = tolist(data.aws_ssoadmin_instances.this.identity_store_ids)[0]
-  group_id          = aws_identitystore_group.administrators.group_id
-  member_id         = aws_organizations_account.production.id
-}
-
 provider "aws" {
   alias  = "production"
   region = "eu-west-2"
