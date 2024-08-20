@@ -11,8 +11,8 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  region                 = data.aws_region.current.name
-  account_id             = data.aws_caller_identity.current.account_id
+  region     = data.aws_region.current.name
+  account_id = data.aws_caller_identity.current.account_id
 }
 
 resource "aws_s3_bucket" "this" {
@@ -20,9 +20,9 @@ resource "aws_s3_bucket" "this" {
 }
 
 resource "aws_dynamodb_table" "this" {
-  name           = "tf-state-${local.region}-${local.account_id}"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "LockID"
+  name         = "tf-state-${local.region}-${local.account_id}"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "LockID"
 
   attribute {
     name = "LockID"

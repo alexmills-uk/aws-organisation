@@ -1,5 +1,5 @@
 provider "aws" {
-  region  = var.region
+  region = var.region
 }
 
 resource "aws_organizations_account" "production" {
@@ -42,5 +42,5 @@ module "production_terraform_state" {
   providers = {
     aws = aws.production
   }
-  depends_on = [ aws_organizations_account.production ]
+  depends_on = [aws_organizations_account.production]
 }
