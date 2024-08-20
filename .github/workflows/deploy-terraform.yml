@@ -26,11 +26,11 @@ jobs:
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-region: ${{ AWS_REGION }}
-        role-to-assume: arn:aws:iam::${{ AWS_ACCOUNT_ID }}:role/github-oidc/github-deployment
+        aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-oidc/github-deployment
 
     - name: Initialize Terraform
-      run: terraform init -backend-config="bucket=tf-state-${{ AWS_REGION }}-${{ AWS_ACCOUNT_ID }}" -backend-config="key=${{ GITHUB_REPOSITORY }}.tfstate" -backend-config="dynamodb_table=tf-state-${{ AWS_REGION }}-${{ AWS_ACCOUNT_ID }}"
+      run: terraform init -backend-config="bucket=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}" -backend-config="key=${{ GITHUB_REPOSITORY }}.tfstate" -backend-config="dynamodb_table=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}"
       
     - name: Plan Terraform
       run: terraform plan -out=tfplan
