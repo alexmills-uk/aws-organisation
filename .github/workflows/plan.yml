@@ -32,15 +32,4 @@ jobs:
       run: terraform init -backend-config="bucket=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}" -backend-config="key=${{ github.repository }}.tfstate" -backend-config="dynamodb_table=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}"
 
     - name: Plan Terraform
-      run: terraform plan -out=tfplan
-
-    - name: Save Terraform Plan
-      run: |
-        echo "Saving Terraform plan..."
-        terraform show -json tfplan > plan.json
-
-    - name: Upload Terraform Plan
-      uses: actions/upload-artifact@v3
-      with:
-        name: terraform-plan
-        path: plan.json
+      run: terraform plan

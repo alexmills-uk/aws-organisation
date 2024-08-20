@@ -36,5 +36,8 @@ jobs:
     - name: Initialize Terraform
       run: terraform init -backend-config="bucket=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}" -backend-config="key=${{ github.repository }}.tfstate" -backend-config="dynamodb_table=tf-state-${{ secrets.AWS_REGION }}-${{ secrets.AWS_ACCOUNT_ID }}"
 
+    - name: Plan Terraform (Ensure Consistency)
+      run: terraform plan -out=plan.cache
+
     - name: Apply Terraform
-      run: terraform apply -auto-approve plan.json
+      run: terraform apply -auto-approve plan.cache
