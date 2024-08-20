@@ -29,7 +29,7 @@ resource "aws_identitystore_group_membership" "alexm_administrators" {
 }
 
 resource "aws_ssoadmin_permission_set" "admin_permissionset" {
-  name         = "AdministratorAccess"
+  name         = "admin-permissionset"
   instance_arn = tolist(data.aws_ssoadmin_instances.this.arns)[0]
 }
 
