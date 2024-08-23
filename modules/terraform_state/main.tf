@@ -44,24 +44,31 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 data "aws_iam_policy_document" "github_oidc_assume_role" {
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
 
     principals {
-      type = "Federated"
+      type        = "Federated"
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
     }
 
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:alexmills-uk/*"]
+      values   = ["repo:alexmills-uk/*:*"]
     }
   }
 }
 
 resource "aws_iam_role" "github_oidc_role" {
   name               = "github-deployment"
+  path               = "github-oidc"
   assume_role_policy = data.aws_iam_policy_document.github_oidc_assume_role.json
 }
 
