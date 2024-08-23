@@ -68,7 +68,7 @@ data "aws_iam_policy_document" "github_oidc_assume_role" {
 
 resource "aws_iam_role" "github_oidc_role" {
   name               = "github-deployment"
-  path               = "github-oidc"
+  path               = "/github-oidc/"
   assume_role_policy = data.aws_iam_policy_document.github_oidc_assume_role.json
 }
 
