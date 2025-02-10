@@ -1,11 +1,12 @@
 locals {
   tags = {
-      Repository = "github.com/alexmills-uk/aws-organisation"
-      Owner = "AlexMills-UK"
-      Role  = "production"
-      Terraform  = "true"
-    }
+    Repository = "github.com/alexmills-uk/aws-organisation"
+    Owner      = "AlexMills-UK"
+    Role       = "production"
+    Terraform  = "true"
+  }
 }
+
 provider "aws" {
   region = var.region
 
@@ -13,3 +14,5 @@ provider "aws" {
     tags = local.tags
   }
 }
+
+data "aws_caller_identity" "current" {}

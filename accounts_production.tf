@@ -36,7 +36,7 @@ module "production_terraform_state" {
 
 # Create an OIDC provider to allow GitHub actions to assume an appropriate role
 module "production_github_oidc" {
-  source = "./modules/github_oidc"
+  source               = "./modules/github_oidc"
   allowed_repositories = ["alexmills-uk/*:*"]
   providers = {
     aws = aws.production
