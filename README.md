@@ -11,7 +11,7 @@ The following details the effect remit of the Landing Zone solution:
 
 * Configuration of Account and Organizational Units
 * Provisioning of new AWS Accounts
-* Management of the Organizational service control policies (TODO)
+* Configuration and Management of Cloudtrail
 * Configuration of the Tagging Policies (TODO)
 * Management of AWS Security Services AWS Config, SecurityHub and GuardDuty (TODO)
 * Configuration and delivery of Organizational level IAM Policies, Identity Permission Sets, RoleSets and Usersets. (TODO)
@@ -31,3 +31,4 @@ The steps are outlined below:
     * AWS_REGION is the "home region" you will use to manage your AWS Organization.
     * AWS_ACCOUNT_ID is the root AWS account that your AWS Organization hangs off.
 * Once the CloudFormation stack is in the Created state, and the Variables have been set in Github, you can run the Deploy Terraform action defined for this repository and the organization will be created.
+* If you wish to manage your AWS Organization with Service Control Policies, in the Console, navigation to Organizations, click Policies in the left-hand menu, select Service Control Policies and finally, click Enable service control policies. Here, you can find some [examples of Service Control Policies](https://github.com/alexmills-uk/aws-service-control-policies).
