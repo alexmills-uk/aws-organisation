@@ -1,8 +1,9 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = ">=5.0.0"
+      source                = "hashicorp/aws"
+      version               = ">=5.0.0"
+      configuration_aliases = [aws.main, aws.audit]
     }
   }
 }
@@ -14,33 +15,28 @@ locals {
   organization_account_id = data.aws_caller_identity.organization_account.id
 }
 
-data "aws_caller_identity" "organization_account" {}
-data "aws_organizations_organization" "org" {}
+data "aws_caller_identity" "organization_account" {
+  provider = aws.main
+}
+data "aws_organizations_organization" "org" {
+  provider = aws.main
+}
+
+resource "null_resource" "enable_cloudtrail_service_access" {
+  provisioner "local-exec" {
+    command = "aws organizations enable-aws-service-access --service-principal cloudtrail.amazonaws.com"
+  }
+}
 
 resource "aws_cloudtrail" "this" {
-  depends_on = [aws_s3_bucket.this, aws_s3_bucket_policy.this]
+  depends_on = [aws_s3_bucket.this, aws_s3_bucket_policy.this, null_resource.enable_cloudtrail_service_access]
 
   name                          = local.cloudtrail_name
   s3_bucket_name                = aws_s3_bucket.this.id
-  s3_key_prefix                 = "prefix"
-  include_global_service_events = false
+  include_global_service_events = true
   is_organization_trail         = true
+  is_multi_region_trail         = true
 }
-
-# Assume the OrganizationAccountAccessRole to jump into the sub-account, and create resources.
-provider "aws" {
-  alias  = "audit"
-  region = "eu-west-2"
-
-  assume_role {
-    role_arn = "arn:aws:iam::${var.audit_account_id}:role/OrganizationAccountAccessRole"
-  }
-
-  allowed_account_ids = [
-    var.audit_account_id
-  ]
-}
-
 
 resource "aws_s3_bucket" "this" {
   bucket_prefix = "cloudtrail-logs-"
