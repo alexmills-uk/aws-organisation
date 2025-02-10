@@ -1,10 +1,6 @@
 terraform {
   required_providers {
-    organization-main-account = {
-      source  = "hashicorp/aws"
-      version = ">=5.0.0"
-    }
-    audit-account = {
+    aws = {
       source  = "hashicorp/aws"
       version = ">=5.0.0"
     }
@@ -18,16 +14,10 @@ locals {
   organization_account_id = data.aws_caller_identity.organization_account.account_id
 }
 
-data "aws_caller_identity" "organization_account" {
-  provider = organization-main-account
-}
-data "aws_organizations_organization" "org" {
-  provider = organization-main-account
-}
+data "aws_caller_identity" "organization_account" {}
+data "aws_organizations_organization" "org" {}
 
 resource "aws_cloudtrail" "this" {
-  provider = organization-main-account
-
   depends_on = [aws_s3_bucket.this, aws_s3_bucket_policy.this]
 
   name                          = local.cloudtrail_name
@@ -37,10 +27,26 @@ resource "aws_cloudtrail" "this" {
   is_organization_trail         = true
 }
 
-resource "aws_s3_bucket" "this" {
-  bucket = "cloudtrail-logs-${random_id.this.id}"
+# Assume the OrganizationAccountAccessRole to jump into the sub-account, and create resources.
+provider "aws" {
+  alias  = "audit"
+  region = "eu-west-2"
 
-  provider = audit-account
+
+  assume_role {
+    role_arn = "arn:aws:iam::${var.audit_account_id}:role/OrganizationAccountAccessRole"
+  }
+
+  allowed_account_ids = [
+    aws_organizations_account.audit.id
+  ]
+}
+
+
+resource "aws_s3_bucket" "this" {
+  bucket_prefix = "cloudtrail-logs-"
+
+  provider = aws.audit
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
@@ -60,19 +66,19 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     status = "Enabled"
   }
 
-  provider = audit-account
+  provider = aws.audit
 }
 
 
 resource "aws_s3_bucket_policy" "this" {
-  policy = data.aws_iam_policy_document.cloudtrail.json
-  bucket = aws_s3_bucket.cloudtrail.id
+  policy = data.aws_iam_policy_document.this.json
+  bucket = aws_s3_bucket.this.id
 
-  provider = audit-account
+  provider = aws.audit
 }
 
 data "aws_iam_policy_document" "this" {
-  provider = audit-account
+  provider = aws.audit
 
   statement {
     sid    = "AWSCloudTrailAclCheck20150319"

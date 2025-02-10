@@ -15,8 +15,4 @@ provider "aws" {
   }
 }
 
-resource "random_id" "this" {
-  byte_length = 8
-}
-
 data "aws_caller_identity" "current" {}
