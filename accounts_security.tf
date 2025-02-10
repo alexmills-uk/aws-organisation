@@ -28,8 +28,8 @@ provider "aws" {
 module "cloudtrail" {
   source = "./modules/organization_cloudtrail"
   providers = {
-    "organization_account" = aws
-    "audit_account"        = aws.audit
+    organization-main-account = aws
+    audit-account             = aws.audit
   }
 
   region = var.region
