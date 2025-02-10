@@ -1,10 +1,10 @@
 terraform {
   required_providers {
-    organization_main_account = {
+    organization-main-account = {
       source  = "hashicorp/aws"
       version = ">=5.0.0"
     }
-    audit_account = {
+    audit-account = {
       source  = "hashicorp/aws"
       version = ">=5.0.0"
     }
@@ -18,11 +18,15 @@ locals {
   organization_account_id = data.aws_caller_identity.organization_account.account_id
 }
 
-data "aws_caller_identity" "organization_account" {}
-data "aws_organizations_organization" "org" {}
+data "aws_caller_identity" "organization_account" {
+  provider = organization-main-account
+}
+data "aws_organizations_organization" "org" {
+  provider = organization-main-account
+}
 
 resource "aws_cloudtrail" "this" {
-  provider = organization_account
+  provider = organization-main-account
 
   depends_on = [aws_s3_bucket.this, aws_s3_bucket_policy.this]
 
@@ -36,7 +40,7 @@ resource "aws_cloudtrail" "this" {
 resource "aws_s3_bucket" "this" {
   bucket = "cloudtrail-logs-${random_id.this.id}"
 
-  provider = audit_account
+  provider = audit-account
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
@@ -56,7 +60,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     status = "Enabled"
   }
 
-  provider = audit_account
+  provider = audit-account
 }
 
 
@@ -64,11 +68,11 @@ resource "aws_s3_bucket_policy" "this" {
   policy = data.aws_iam_policy_document.cloudtrail.json
   bucket = aws_s3_bucket.cloudtrail.id
 
-  provider = audit_account
+  provider = audit-account
 }
 
 data "aws_iam_policy_document" "this" {
-  provider = audit_account
+  provider = audit-account
 
   statement {
     sid    = "AWSCloudTrailAclCheck20150319"
