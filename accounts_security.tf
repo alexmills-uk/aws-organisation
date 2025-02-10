@@ -10,6 +10,6 @@ resource "aws_organizations_account" "audit" {
 module "cloudtrail" {
   source = "./modules/organization_cloudtrail"
 
-  audit_account_id = aws_organizations_account.audit.account_id
+  audit_account_id = aws_organizations_account.audit.id
   region           = var.region
 }
