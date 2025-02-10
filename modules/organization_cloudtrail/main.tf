@@ -11,7 +11,7 @@ locals {
   # defining this as a local allows us to reuse the same value in multiple places, 
   # without causing a cyclical dependency between aws_cloudtrail.this and aws_s3_bucket_policy.cloudtrail
   cloudtrail_name         = "org-cloudtrail"
-  organization_account_id = data.aws_caller_identity.organization_account.account_id
+  organization_account_id = data.aws_caller_identity.organization_account.id
 }
 
 data "aws_caller_identity" "organization_account" {}
