@@ -46,12 +46,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
     id = "Archive logs to lower tiers"
 
     transition {
-      days          = 30
+      days          = var.log_archive_days
       storage_class = "GLACIER"
     }
 
     expiration {
-      days = 365
+      days = var.log_expiry_days
     }
     status = "Enabled"
   }
