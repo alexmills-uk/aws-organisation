@@ -40,7 +40,7 @@ data "aws_iam_policy_document" "github_oidc_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = [
+      values = [
         for repository in var.allowed_repositories : "repo:${repository}"
       ]
     }
